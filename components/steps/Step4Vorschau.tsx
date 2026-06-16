@@ -35,10 +35,21 @@ export function Step4Vorschau({ data }: Props) {
       <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
         <p className="font-medium mb-1">Hinweise zum Upload im BaFin MVP-Portal</p>
         <ul className="list-disc pl-4 space-y-1">
-          <li>Die XML-Datei muss vor dem Upload <strong>gzip-komprimiert</strong> werden (.xml.gz)</li>
-          <li>Der Dateiname muss der BaFin-Namenskonvention entsprechen (siehe BaFin-Merkblatt)</li>
           <li>
-            Der fachliche Schlüssel besteht aus: <strong>AIFMNationalCode + ReportingPeriodType + ReportingPeriodYear</strong> —
+            Die XML-Datei muss vor dem Upload <strong>gzip-komprimiert</strong> werden (.xml.gz) —
+            z.B. mit 7-Zip: Rechtsklick → 7-Zip → Zu &quot;Dateiname.xml.gz&quot; hinzufügen
+          </li>
+          <li>
+            <strong>Dateiname:</strong> Der heruntergeladene Dateiname folgt dem Muster{" "}
+            <code className="bg-amber-100 px-1 rounded">AIFM_[BaFin-ID]_[Jahr]_[Periode].xml</code>.
+            Beispiel VRUK:{" "}
+            <code className="bg-amber-100 px-1 rounded">AIFM_10162899_2025_Y1.xml</code> →
+            nach Komprimierung:{" "}
+            <code className="bg-amber-100 px-1 rounded">AIFM_10162899_2025_Y1.xml.gz</code>.
+            Bitte die exakte BaFin-Namenskonvention im BaFin-Merkblatt prüfen.
+          </li>
+          <li>
+            <strong>Fachlicher Schlüssel:</strong> AIFMNationalCode + ReportingPeriodType + ReportingPeriodYear —
             eine erneute Einreichung mit gleichem Schlüssel überschreibt die vorherige Meldung vollständig
           </li>
           <li>Nach dem Upload stellt die BaFin eine Feedback-Datei bereit (kann einige Tage dauern)</li>

@@ -21,71 +21,45 @@ const MARKET_CODE_TYPE_LABELS = {
 
 const marketsTooltip = (
   <div>
-    <p>Die 5 wichtigsten Märkte, an denen die KVG für ihre AIF handelt — über alle AIF aggregiert, absteigend nach Wert. Nicht genutzte Ränge auf <strong>NOT</strong> setzen (kein Betrag).</p>
-    <p className="mt-1"><strong>Markttypen:</strong> MIC = Börse (MIC-Code angeben) · OTC = außerbörslich · XXX = kein spezifischer Markt (direkte Investments) · NOT = Rang nicht genutzt</p>
-    <TooltipSection label="PE-Buyout MidCap Beispiel">
-      <p>Rang 1: <strong>XXX</strong> – Portfoliounternehmen (Fair Value, z.B. 240.000.000)</p>
-      <p>Rang 2: <strong>OTC</strong> – Liquiditätsanlagen / Geldmarkt (z.B. 10.000.000)</p>
-      <p>Rang 3: <strong>MIC + XFRA</strong> – falls börsennotierte Positionen (post-IPO, Anteilstausch)</p>
-      <p>Ränge ohne Nutzung: <strong>NOT</strong> (kein Betrag)</p>
-    </TooltipSection>
-    <TooltipSection label="VRUK">
-      <p>Bei <strong>NoReportingFlag = true</strong> entfällt dieser Block. Sobald ein AIF aktiv investiert, Flag deaktivieren und Märkte befüllen.</p>
-    </TooltipSection>
+    <p>Die 5 wichtigsten Märkte, an denen die KVG für ihre AIF handelt — aggregiert über alle verwalteten AIF, absteigend nach Handelswert sortiert. Details zu Markttypen, Wertangaben und PE-typischen Beispielen: siehe Hilfetexte bei den einzelnen Feldern je Rang.</p>
   </div>
 );
 
 const marketTypeTooltip = (
   <div>
-    <p><strong>MIC</strong> – Regulierter Handelsplatz mit ISO-10383-Code → MIC-Code pflegen (z.B. XFRA, XETR, XLON). Für börsennotierte Positionen nach IPO oder Anteilstausch.</p>
-    <p className="mt-1"><strong>OTC</strong> – Außerbörslich: Geldmarktinstrumente, Schuldscheindarlehen, OTC-Derivate zur Absicherung.</p>
-    <p className="mt-1"><strong>XXX</strong> – Kein spezifischer Markt: direkte Unternehmensbeteiligungen (nicht börsennotiert). Wert = Fair Value der Portfoliounternehmen.</p>
-    <p className="mt-1"><strong>NOT</strong> – Rang nicht genutzt. Kein Betrag angeben. NOT ≠ XXX.</p>
+    <p><strong>PE-Buyout typisch:</strong></p>
+    <p className="mt-1">Rang 1 → <strong>XXX</strong>: direkte Beteiligungen an nicht-börsennotierten Unternehmen</p>
+    <p>Rang 2 → <strong>OTC</strong>: Liquiditätsanlagen, Geldmarkt, Schuldscheindarlehen</p>
+    <p>Rang 3 → <strong>MIC</strong> + Code: börsennotierte Positionen falls vorhanden (post-IPO, Anteilstausch), z.B. XFRA, XETR</p>
+    <p className="mt-1">Nicht genutzter Rang → <strong>NOT</strong> (kein Betrag, NOT ≠ XXX)</p>
   </div>
 );
 
 const marketValueTooltip = (
   <div>
-    <p>Summe aller Assets dieses Markttyps, über alle AIF aggregiert, in der Basiswährung, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums.</p>
-    <TooltipSection label="Je nach Markttyp">
-      <p><strong>XXX:</strong> Fair Value der direkten Unternehmensbeteiligungen</p>
-      <p><strong>OTC:</strong> Wert der Geldmarkt-/Liquiditätsanlagen</p>
-      <p><strong>MIC:</strong> Börsenmarktwert der notierten Positionen</p>
-      <p><strong>NOT:</strong> kein Betrag</p>
-    </TooltipSection>
+    <p>Aggregierter Wert in Basiswährung, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums.</p>
+    <p className="mt-1"><strong>XXX</strong>: Fair Value der Portfoliounternehmen</p>
+    <p><strong>OTC</strong>: Wert der Liquiditätsanlagen / Geldmarkt</p>
+    <p><strong>MIC</strong>: Börsenwert der notierten Positionen</p>
+    <p><strong>NOT</strong>: kein Betrag</p>
   </div>
 );
 
 const instrumentsTooltip = (
   <div>
-    <p>Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 AIFMD-Verordnung), über alle AIF aggregiert, absteigend nach Wert. Nicht genutzte Ränge auf <strong>NTA_NTA_NOTA</strong> setzen (kein Betrag).</p>
-    <TooltipSection label="PE-Buyout MidCap Beispiel">
-      <p>Rang 1: <strong>SEC_SHP_NES</strong> – direkte Eigenkapitalbeteiligungen (nicht börsennotiert), Fair Value z.B. 240 Mio.</p>
-      <p>Rang 2: <strong>LON_LON_LCOR</strong> – Mezzanine / Gesellschafterdarlehen, z.B. 30 Mio.</p>
-      <p>Rang 3: <strong>SEC_MBO_MMKT</strong> oder <strong>CSH_CSH_DPST</strong> – Liquiditätsreserve / Bankguthaben, z.B. 10 Mio.</p>
-      <p>Rang 4: <strong>SEC_SHP_EQS</strong> – falls börsennotierte Positionen (post-IPO, Anteilstausch)</p>
-      <p>Rang 4/5: <strong>DER_FEX_HEDG</strong> oder <strong>DER_IRD_INTR</strong> – Währungs- oder Zinsabsicherung falls vorhanden</p>
-      <p>Nicht genutzte Ränge: <strong>NTA_NTA_NOTA</strong></p>
-    </TooltipSection>
-    <TooltipSection label="VRUK">
-      <p>Bei <strong>NoReportingFlag = true</strong> entfällt dieser Block. Sobald ein AIF aktiv investiert, Flag deaktivieren und Instrumente befüllen.</p>
-    </TooltipSection>
+    <p>Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 AIFMD-Verordnung), aggregiert über alle verwalteten AIF, absteigend nach Wert sortiert. Details zu Sub-Asset-Typen und PE-typischen Beispielen: siehe Hilfetexte bei den einzelnen Feldern je Rang.</p>
   </div>
 );
 
 const subAssetTypeTooltip = (
   <div>
-    <p>Asset-Klasse nach Annex II Tabelle 1 AIFMD-Verordnung, höchster verfügbarer Detaillierungsgrad verwenden.</p>
-    <TooltipSection label="Wichtigste Typen für PE-Fonds">
-      <p><strong>SEC_SHP_NES</strong> – Eigenkapital nicht-börsennotiert (Kernposition PE-Buyout)</p>
-      <p><strong>SEC_SHP_EQS</strong> – Aktien börsennotiert (post-IPO, Anteilstausch)</p>
-      <p><strong>LON_LON_LCOR</strong> – Unternehmenskredite / Mezzanine</p>
-      <p><strong>SEC_MBO_MMKT</strong> – Geldmarktinstrumente (Liquiditätsanlage)</p>
-      <p><strong>CSH_CSH_DPST</strong> – Bankguthaben / Einlagen</p>
-      <p><strong>DER_FEX_HEDG</strong> – Devisenderivate (Währungsabsicherung)</p>
-      <p><strong>DER_IRD_INTR</strong> – Zinsderivate (Zinsabsicherung)</p>
-      <p><strong>NTA_NTA_NOTA</strong> – Rang nicht genutzt (kein Betrag)</p>
-    </TooltipSection>
+    <p><strong>PE-Buyout typisch:</strong></p>
+    <p className="mt-1">Rang 1 → <strong>SEC_SHP_NES</strong>: Eigenkapitalbeteiligungen nicht-börsennotiert</p>
+    <p>Rang 2 → <strong>LON_LON_LCOR</strong>: Mezzanine / Gesellschafterdarlehen</p>
+    <p>Rang 3 → <strong>SEC_MBO_MMKT</strong> oder <strong>CSH_CSH_DPST</strong>: Liquiditätsanlagen / Bankguthaben</p>
+    <p>Rang 4 → <strong>SEC_SHP_EQS</strong>: börsennotiert (post-IPO, Anteilstausch) — falls vorhanden</p>
+    <p>Rang 4/5 → <strong>DER_FEX_HEDG</strong> / <strong>DER_IRD_INTR</strong>: Währungs- / Zinsabsicherung — falls vorhanden</p>
+    <p className="mt-1">Nicht genutzter Rang → <strong>NTA_NTA_NOTA</strong> (kein Betrag)</p>
   </div>
 );
 
