@@ -28,10 +28,11 @@ const marketsTooltip = (
 const marketTypeTooltip = (
   <div>
     <p><strong>PE-Buyout typisch:</strong></p>
-    <p className="mt-1">Rang 1 → <strong>XXX</strong>: direkte Beteiligungen an nicht-börsennotierten Unternehmen</p>
+    <p className="mt-1">Rang 1 → <strong>XXX</strong>: direkte Beteiligungen an nicht-börsennotierten Unternehmen (GmbH, AG nicht notiert, KG)</p>
     <p>Rang 2 → <strong>OTC</strong>: Liquiditätsanlagen, Geldmarkt, Schuldscheindarlehen</p>
     <p>Rang 3 → <strong>MIC</strong> + Code: börsennotierte Positionen falls vorhanden (post-IPO, Anteilstausch), z.B. XFRA, XETR</p>
-    <p className="mt-1">Nicht genutzter Rang → <strong>NOT</strong> (kein Betrag, NOT ≠ XXX)</p>
+    <p className="mt-1">Nicht genutzter Rang → <strong>NOT</strong> (kein Betrag)</p>
+    <p className="mt-1 opacity-70 text-xs">NOT ≠ XXX: NOT bedeutet &quot;Rang leer&quot;, XXX bedeutet &quot;Investment ohne Börsenmarkt&quot;</p>
   </div>
 );
 
@@ -54,7 +55,7 @@ const instrumentsTooltip = (
 const subAssetTypeTooltip = (
   <div>
     <p><strong>PE-Buyout typisch:</strong></p>
-    <p className="mt-1">Rang 1 → <strong>SEC_SHP_NES</strong>: Eigenkapitalbeteiligungen nicht-börsennotiert</p>
+    <p className="mt-1">Rang 1 → <strong>SEC_SHP_NES</strong>: Eigenkapitalbeteiligungen nicht-börsennotiert (GmbH-Anteile, nicht notierte AG-Aktien, KG-Anteile — alle Rechtsformen)</p>
     <p>Rang 2 → <strong>LON_LON_LCOR</strong>: Mezzanine / Gesellschafterdarlehen</p>
     <p>Rang 3 → <strong>SEC_MBO_MMKT</strong> oder <strong>CSH_CSH_DPST</strong>: Liquiditätsanlagen / Bankguthaben</p>
     <p>Rang 4 → <strong>SEC_SHP_EQS</strong>: börsennotiert (post-IPO, Anteilstausch) — falls vorhanden</p>

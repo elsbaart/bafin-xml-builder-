@@ -129,14 +129,14 @@ export const SUB_ASSET_TYPES: { value: string; label: string }[] = [
 
 export const DEFAULT_MARKETS: MarketEntry[] = Array.from({ length: 5 }, (_, i) => ({
   ranking: i + 1,
-  marketCodeType: "NOT" as MarketCodeType,
+  marketCodeType: (i === 0 ? "XXX" : "NOT") as MarketCodeType,
   marketCode: "",
   aggregatedValueAmount: "",
 }));
 
 export const DEFAULT_INSTRUMENTS: InstrumentEntry[] = Array.from({ length: 5 }, (_, i) => ({
   ranking: i + 1,
-  subAssetType: "NTA_NTA_NOTA",
+  subAssetType: i === 0 ? "SEC_SHP_NES" : "NTA_NTA_NOTA",
   aggregatedValueAmount: "",
 }));
 
