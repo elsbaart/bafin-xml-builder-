@@ -139,10 +139,10 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
       <div>
         <h3 className="font-medium mb-1 flex items-center gap-1">
           5 wichtigste Instrumentenklassen (AIFMPrincipalInstruments)
-          <FieldHelp text="Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 der delegierten AIFMD-Verordnung), in denen die KVG für ihre AIF handelt — aggregiert. Absteigend nach aggregiertem Wert sortieren. Typisch für einen PE-Buyout-Fonds MidCap: Rang 1 = SEC_SHP_NES (nicht börsennotierte Aktien / Eigenkapitalbeteiligungen), Rang 2 = LON_LON_LCOR (Unternehmenskredite / Mezzanine), Ränge 3–5 = NTA_NTA_NOTA." />
+          <FieldHelp text="Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 AIFMD-Verordnung), in denen die KVG für ihre AIF handelt — über alle AIF aggregiert, absteigend nach Wert. PE-Buyout MidCap Beispiel: Rang 1 = SEC_SHP_NES (direkte Eigenkapitalbeteiligungen an nicht-börsennotierten Unternehmen, Fair Value z.B. 240 Mio.), Rang 2 = LON_LON_LCOR (Mezzanine- oder Gesellschafterdarlehen, z.B. 30 Mio.), Rang 3 = SEC_MBO_MMKT oder CSH_CSH_DPST (Liquiditätsreserve / Geldmarkt, z.B. 10 Mio.), Rang 4 = SEC_SHP_EQS falls börsennotierte Positionen nach IPO oder Anteilstausch vorhanden. Nicht genutzte Ränge: NTA_NTA_NOTA (kein Betrag). NTA_NTA_NOTA ≠ 'kein Markt' — es bedeutet 'dieser Rang wird nicht genutzt'." />
         </h3>
         <p className="text-sm text-muted-foreground mb-3">
-          PE-Buyout MidCap typisch: <strong>Rang 1: SEC_SHP_NES</strong> (nicht börsennotierte Aktien), <strong>Rang 2: LON_LON_LCOR</strong> (Unternehmenskredite)
+          PE-Buyout typisch: <strong>Rang 1 SEC_SHP_NES</strong> (Eigenkapital nicht-börsennotiert) · <strong>Rang 2 LON_LON_LCOR</strong> (Mezzanine/Kredit) · <strong>Rang 3 SEC_MBO_MMKT</strong> (Liquidität) · nicht genutzte Ränge auf <strong>NTA_NTA_NOTA</strong>
         </p>
         <div className="space-y-4">
           {data.principalInstruments.map((inst, i) => (
@@ -154,7 +154,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Sub-Asset-Typ
-                    <FieldHelp text="Asset-Klasse gemäß Annex II Tabelle 1 der delegierten AIFMD-Verordnung (ESMA/2014/869). Höchster verfügbarer Detaillierungsgrad verwenden. PE-Buyout: SEC_SHP_NES (nicht börsennotierte Eigenkapitalbeteiligungen). Bei Mezzanine/Kredit: LON_LON_LCOR. Nicht genutzte Ränge: NTA_NTA_NOTA." />
+                    <FieldHelp text="Asset-Klasse nach Annex II Tabelle 1 AIFMD-Verordnung, höchster Detaillierungsgrad. Wichtigste Typen für PE: SEC_SHP_NES = direkte Eigenkapitalbeteiligungen (nicht börsennotiert, Hauptposition PE-Buyout), SEC_SHP_EQS = börsennotierte Aktien (post-IPO oder nach Anteilstausch), LON_LON_LCOR = Unternehmenskredite / Mezzanine, SEC_MBO_MMKT = Geldmarktinstrumente (Liquiditätsanlage), CSH_CSH_DPST = Einlagen/Bankguthaben. NTA_NTA_NOTA = Rang nicht genutzt (kein Betrag angeben). Wert = Fair Value bzw. Marktwert aller Positionen dieser Klasse über alle AIF, in Basiswährung, ohne Dezimalstellen." />
                   </Label>
                   <Select
                     value={inst.subAssetType}
