@@ -18,13 +18,13 @@ export function Step2AIFMStammdaten({ data, onChange }: Props) {
       <div>
         <Label className="flex items-center gap-1">
           AIFM-Status (AIFMReportingCode)
-          <FieldHelp text="Gibt an, unter welchem Artikel der AIFMD der AIFM gemeldet wird. Registrierte KVGen nach Art. 3 wählen Code 1. Vollständig zugelassene KVGen nach Art. 7 wählen je nach Frequenz Code 2–5." />
+          <FieldHelp text="Gibt an, unter welchem Artikel der AIFMD die KVG gemeldet wird. Typisch für VRUK und einen PE-Buyout-Fonds als registrierte KVG nach Art. 3: Code 1. Für zugelassene KVGen mit nur ungehebelten PE-Fonds: Code 3." />
         </Label>
         <Select value={data.aifmReportingCode} onValueChange={(v) => onChange({ aifmReportingCode: v as AIFMFormData["aifmReportingCode"] })}>
           <SelectTrigger className="mt-1">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="min-w-[620px]">
             {(Object.entries(REPORTING_CODE_LABELS) as [AIFMFormData["aifmReportingCode"], string][]).map(([k, v]) => (
               <SelectItem key={k} value={k}>{v}</SelectItem>
             ))}
@@ -36,7 +36,7 @@ export function Step2AIFMStammdaten({ data, onChange }: Props) {
       <div>
         <Label className="flex items-center gap-1">
           Sitzland des AIFM (AIFMJurisdiction)
-          <FieldHelp text="ISO-3166-1 Ländercode des Staates, in dem der AIFM seinen Sitz hat. Für in Deutschland ansässige KVGen: DE." />
+          <FieldHelp text="ISO-3166-1 Ländercode des Staates, in dem der AIFM seinen Sitz hat. Für deutsche KVGen immer: DE." />
         </Label>
         <Input
           className="mt-1 w-24"
@@ -51,7 +51,7 @@ export function Step2AIFMStammdaten({ data, onChange }: Props) {
       <div>
         <Label className="flex items-center gap-1">
           BaFin-ID (AIFMNationalCode)
-          <FieldHelp text="Eindeutige BaFin-Kennnummer der KVG, bestehend aus 8 Stellen (z.B. 10162899). Diese wird von der BaFin bei Registrierung oder Zulassung vergeben." />
+          <FieldHelp text="Eindeutige BaFin-Kennnummer der KVG, bestehend aus 8 Stellen. Diese wird bei Registrierung oder Zulassung von der BaFin vergeben. Für VRUK: 10162899." />
         </Label>
         <Input
           className="mt-1"
@@ -65,7 +65,7 @@ export function Step2AIFMStammdaten({ data, onChange }: Props) {
       <div>
         <Label className="flex items-center gap-1">
           Name der KVG (AIFMName)
-          <FieldHelp text="Vollständiger Name der Kapitalverwaltungsgesellschaft gemäß Erlaubniserteilung. Empfehlung: Identisch mit dem zum LEI-Code hinterlegten Namen." />
+          <FieldHelp text="Vollständiger rechtlicher Name der Kapitalverwaltungsgesellschaft gemäß Erlaubniserteilung bzw. Registrierung. Empfehlung: identisch mit dem zum LEI-Code hinterlegten Namen." />
         </Label>
         <Input
           className="mt-1"
@@ -88,9 +88,9 @@ export function Step2AIFMStammdaten({ data, onChange }: Props) {
         <div>
           <Label htmlFor="eeaFlag" className="cursor-pointer flex items-center gap-1">
             AIFM im EWR ansässig (AIFMEEAFlag)
-            <FieldHelp text="Aktivieren wenn der AIFM seinen Sitz im Europäischen Wirtschaftsraum (EWR) hat. Für deutsche KVGen immer aktiviert." />
+            <FieldHelp text="Aktivieren wenn der AIFM seinen Sitz im Europäischen Wirtschaftsraum (EWR / EEA) hat. Für deutsche KVGen wie VRUK: immer aktiviert." />
           </Label>
-          <p className="text-xs text-muted-foreground mt-0.5">Für deutsche KVGen: aktiviert</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Für deutsche KVGen: immer aktiviert</p>
         </div>
       </div>
 
@@ -106,10 +106,10 @@ export function Step2AIFMStammdaten({ data, onChange }: Props) {
         <div>
           <Label htmlFor="noReporting" className="cursor-pointer flex items-center gap-1">
             Keine AIF-Daten zu melden (AIFMNoReportingFlag)
-            <FieldHelp text="Aktivieren wenn für den Meldezeitraum keine Daten zu verwalteten AIF vorliegen – z.B. weil noch keine AIF aufgelegt wurden oder zwischen Zulassung und Erstinvestition. Bei Aktivierung entfällt der Block 'AIFM-Beschreibung'." />
+            <FieldHelp text="Aktivieren wenn für den Meldezeitraum keine Daten zu verwalteten AIF vorliegen — z.B. weil noch keine AIF aufgelegt wurden oder zwischen Zulassung und Erstinvestition. Bei Aktivierung entfällt der nächste Schritt (Märkte, Instrumente, AuM). Bisherige VRUK-Meldungen: aktiviert. Sobald ein AIF aktiv investiert ist: deaktivieren." />
           </Label>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Wenn aktiviert: Nur Header wird gemeldet, keine Märkte/Instrumente/AuM erforderlich
+            Deaktivieren sobald AIF aktiv investiert ist → dann Schritt 3 ausfüllen
           </p>
         </div>
       </div>

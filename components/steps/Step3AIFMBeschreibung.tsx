@@ -13,9 +13,9 @@ interface Props {
 }
 
 const MARKET_CODE_TYPE_LABELS = {
-  MIC: "MIC – Handelsplatz mit MIC-Code",
-  OTC: "OTC – Over-the-Counter",
-  XXX: "XXX – Kein spezifischer Markt",
+  MIC: "MIC – Handelsplatz mit MIC-Code (z.B. XFRA für Frankfurt)",
+  OTC: "OTC – Over-the-Counter / außerbörslich",
+  XXX: "XXX – Kein spezifischer Markt (typisch für PE-Fonds)",
   NOT: "NOT – Kein Eintrag für diesen Rang",
 };
 
@@ -41,20 +41,20 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
           <div>
             <Label className="flex items-center gap-1">
               LEI-Code (AIFMIdentifierLEI)
-              <FieldHelp text="Legal Entity Identifier nach ISO 17442, 20-stellig. Empfehlung: Angabe des LEI sofern vorhanden. Die BaFin prüft die Prüfsumme. Bei Änderung des LEI sind zusätzlich ReportingMemberState und AIFMNationalCode anzugeben." />
+              <FieldHelp text="Legal Entity Identifier nach ISO 17442, 20-stellig. Die BaFin prüft die Prüfsumme. Bei Änderung des LEI sind zusätzlich ReportingMemberState und AIFMNationalCode in den Identifier-Block aufzunehmen. Für VRUK: LEI bei der Bundesbank oder GLEIF abrufbar." />
             </Label>
             <Input
               className="mt-1 font-mono"
               value={data.aifmIdentifierLEI}
               maxLength={20}
-              placeholder="z.B. 529900T8BM49AURSDO55"
+              placeholder="20-stelliger LEI-Code"
               onChange={(e) => onChange({ aifmIdentifierLEI: e.target.value.toUpperCase() })}
             />
           </div>
           <div>
             <Label className="flex items-center gap-1">
               BIC-Code (AIFMIdentifierBIC)
-              <FieldHelp text="BIC-Code nach ISO 9362, 8 oder 11 Stellen. Optional, kann anstelle eines LEI angegeben werden wenn kein LEI verfügbar ist." />
+              <FieldHelp text="BIC-Code nach ISO 9362, 8 oder 11 Stellen. Optional — kann angegeben werden wenn kein LEI verfügbar ist oder zusätzlich zum LEI." />
             </Label>
             <Input
               className="mt-1 font-mono"
@@ -71,10 +71,10 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
       <div>
         <h3 className="font-medium mb-1 flex items-center gap-1">
           5 wichtigste Handelsmärkte (AIFMPrincipalMarkets)
-          <FieldHelp text="Die 5 wichtigsten Märkte, an denen die KVG für ihre AIF handelt. Sortierung absteigend nach aggregiertem Wert. Werden weniger als 5 Märkte genutzt, die verbleibenden Ränge auf 'NOT' setzen." />
+          <FieldHelp text="Die 5 wichtigsten Märkte, an denen die KVG für ihre AIF handelt — aggregiert über alle verwalteten AIF. Absteigend nach aggregiertem Wert sortieren. Typisch für einen PE-Buyout-Fonds MidCap: alle 5 Ränge auf 'XXX' (kein spezifischer Markt), da PE-Investments nicht an Börsen gehandelt werden. Aggregierter Wert = Gesamtinvestitionsvolumen des jeweiligen Marktes in der Basiswährung." />
         </h3>
         <p className="text-sm text-muted-foreground mb-3">
-          Absteigend nach Handelswert sortieren. Nicht genutzte Ränge auf &quot;NOT&quot; setzen.
+          PE-Fonds: typischerweise alle Ränge auf <strong>XXX</strong> (kein spezifischer Markt)
         </p>
         <div className="space-y-4">
           {data.principalMarkets.map((m, i) => (
@@ -86,7 +86,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Markttyp
-                    <FieldHelp text="MIC: Handelsplatz mit bekanntem ISO-10383-Code. OTC: außerbörslicher Handel. XXX: kein spezifischer Markt. NOT: dieser Rang wird nicht genutzt." />
+                    <FieldHelp text="MIC: Regulierter Handelsplatz mit ISO-10383-Code (Börsen). OTC: außerbörslicher Handel. XXX: kein spezifischer Markt — typisch für PE (Direktinvestments in Unternehmen). NOT: dieser Rang wird nicht genutzt." />
                   </Label>
                   <Select
                     value={m.marketCodeType}
@@ -95,7 +95,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="min-w-[380px]">
                       {Object.entries(MARKET_CODE_TYPE_LABELS).map(([k, v]) => (
                         <SelectItem key={k} value={k}>{v}</SelectItem>
                       ))}
@@ -105,7 +105,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     MIC-Code
-                    <FieldHelp text="Nur ausfüllen wenn Markttyp = MIC. Vierstelliger ISO-10383-Code des Handelsplatzes (z.B. XMUN für Börse München, XFRA für Frankfurt)." />
+                    <FieldHelp text="Nur ausfüllen wenn Markttyp = MIC. Vierstelliger ISO-10383-Code des Handelsplatzes. Beispiele: XFRA (Frankfurt), XMUN (München), XETR (Xetra), XLON (London). Entfällt bei PE-Fonds (XXX)." />
                   </Label>
                   <Input
                     className="mt-1 font-mono"
@@ -119,13 +119,13 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Aggregierter Wert (Basiswährung)
-                    <FieldHelp text="Aggregierter Wert aller Assets, die an diesem Markt gehandelt werden. In der Basiswährung des AIFM, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums. Entfällt bei Markttyp NOT." />
+                    <FieldHelp text="Aggregierter Wert aller Assets, die an diesem Markt gehandelt werden — über alle AIF summiert, in der Basiswährung des AIFM, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums. Entfällt bei Markttyp NOT." />
                   </Label>
                   <Input
                     className="mt-1"
                     value={m.aggregatedValueAmount}
                     disabled={m.marketCodeType === "NOT"}
-                    placeholder={m.marketCodeType === "NOT" ? "—" : "z.B. 3657723241"}
+                    placeholder={m.marketCodeType === "NOT" ? "—" : "Betrag ohne Dezimalstellen"}
                     onChange={(e) => updateMarket(i, { aggregatedValueAmount: e.target.value })}
                   />
                 </div>
@@ -139,10 +139,10 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
       <div>
         <h3 className="font-medium mb-1 flex items-center gap-1">
           5 wichtigste Instrumentenklassen (AIFMPrincipalInstruments)
-          <FieldHelp text="Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types), in denen die KVG für ihre AIF handelt. Sortierung absteigend nach aggregiertem Wert. Werden weniger als 5 genutzt, die restlichen Ränge auf NTA_NTA_NOTA setzen." />
+          <FieldHelp text="Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 der delegierten AIFMD-Verordnung), in denen die KVG für ihre AIF handelt — aggregiert. Absteigend nach aggregiertem Wert sortieren. Typisch für einen PE-Buyout-Fonds MidCap: Rang 1 = SEC_SHP_NES (nicht börsennotierte Aktien / Eigenkapitalbeteiligungen), Rang 2 = LON_LON_LCOR (Unternehmenskredite / Mezzanine), Ränge 3–5 = NTA_NTA_NOTA." />
         </h3>
         <p className="text-sm text-muted-foreground mb-3">
-          Absteigend nach Handelswert sortieren. Nicht genutzte Ränge auf &quot;NTA_NTA_NOTA&quot; setzen.
+          PE-Buyout MidCap typisch: <strong>Rang 1: SEC_SHP_NES</strong> (nicht börsennotierte Aktien), <strong>Rang 2: LON_LON_LCOR</strong> (Unternehmenskredite)
         </p>
         <div className="space-y-4">
           {data.principalInstruments.map((inst, i) => (
@@ -154,7 +154,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Sub-Asset-Typ
-                    <FieldHelp text="Asset-Klasse gemäß Annex II, Tabelle 1 der delegierten AIFMD-Verordnung (ESMA 2014/869). Es ist der höchste verfügbare Detaillierungsgrad zu verwenden." />
+                    <FieldHelp text="Asset-Klasse gemäß Annex II Tabelle 1 der delegierten AIFMD-Verordnung (ESMA/2014/869). Höchster verfügbarer Detaillierungsgrad verwenden. PE-Buyout: SEC_SHP_NES (nicht börsennotierte Eigenkapitalbeteiligungen). Bei Mezzanine/Kredit: LON_LON_LCOR. Nicht genutzte Ränge: NTA_NTA_NOTA." />
                   </Label>
                   <Select
                     value={inst.subAssetType}
@@ -163,7 +163,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="max-h-72">
+                    <SelectContent className="min-w-[460px] max-h-72">
                       {SUB_ASSET_TYPES.map((t) => (
                         <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
                       ))}
@@ -179,7 +179,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                     className="mt-1"
                     value={inst.aggregatedValueAmount}
                     disabled={inst.subAssetType === "NTA_NTA_NOTA"}
-                    placeholder={inst.subAssetType === "NTA_NTA_NOTA" ? "—" : "z.B. 3210283231"}
+                    placeholder={inst.subAssetType === "NTA_NTA_NOTA" ? "—" : "Betrag ohne Dezimalstellen"}
                     onChange={(e) => updateInstrument(i, { aggregatedValueAmount: e.target.value })}
                   />
                 </div>
@@ -196,19 +196,19 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
           <div>
             <Label className="flex items-center gap-1">
               AuM in Euro (AUMAmountInEuro)
-              <FieldHelp text="Gesamte verwaltete Vermögenswerte aller AIF in Euro, berechnet nach Art. 2 der delegierten AIFMD-Verordnung. Angabe ohne Dezimalstellen." />
+              <FieldHelp text="Gesamte verwaltete Vermögenswerte aller AIF in Euro, berechnet nach Art. 2 der delegierten AIFMD-Verordnung (Brutto-Methode: Summe der absoluten Werte aller Positionen). Angabe ohne Dezimalstellen. PE-Buyout MidCap: typisch 150–500 Mio. EUR, z.B. 250000000." />
             </Label>
             <Input
               className="mt-1"
               value={data.aumAmountInEuro}
-              placeholder="z.B. 300000001"
+              placeholder="z.B. 250000000"
               onChange={(e) => onChange({ aumAmountInEuro: e.target.value })}
             />
           </div>
           <div>
             <Label className="flex items-center gap-1">
               Basiswährung (BaseCurrency)
-              <FieldHelp text="ISO-4217-Währungscode der Basiswährung des AIFM (z.B. EUR, USD, GBP). Nur anzugeben, wenn alle AIF dieselbe Basiswährung haben. Bei EUR entfallen FX-Rate-Angaben." />
+              <FieldHelp text="ISO-4217-Währungscode der Basiswährung des AIFM (z.B. EUR, USD, GBP). Nur anzugeben wenn alle AIF dieselbe Basiswährung haben. Bei EUR entfallen FX-Rate-Angaben. Typisch für deutsche PE-Fonds: EUR." />
             </Label>
             <Input
               className="mt-1 w-28 font-mono"
@@ -220,7 +220,6 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
           </div>
         </div>
 
-        {/* Non-EUR fields */}
         {nonEUR && (
           <div className="mt-4 p-4 border rounded-md space-y-4 bg-muted/30">
             <p className="text-sm font-medium">Wechselkursangaben (erforderlich bei Nicht-EUR-Basiswährung)</p>
@@ -233,14 +232,14 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <Input
                   className="mt-1"
                   value={data.aumAmountInBaseCurrency}
-                  placeholder="z.B. 350000000"
+                  placeholder="Betrag ohne Dezimalstellen"
                   onChange={(e) => onChange({ aumAmountInBaseCurrency: e.target.value })}
                 />
               </div>
               <div>
                 <Label className="flex items-center gap-1 text-sm">
                   Wechselkursquelle
-                  <FieldHelp text="ECB: Wechselkurs aus dem EZB-Referenzkurs. OTH: Andere Quelle (dann Quellenname angeben)." />
+                  <FieldHelp text="ECB: Wechselkurs aus dem EZB-Referenzkurs (tägliche Veröffentlichung). OTH: Andere Quelle (z.B. Bloomberg, Reuters) — dann Quellenname im nächsten Feld angeben." />
                 </Label>
                 <Select
                   value={data.fxEURReferenceRateType}
@@ -249,7 +248,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Quelle wählen" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="min-w-[280px]">
                     <SelectItem value="ECB">ECB – EZB-Referenzkurs</SelectItem>
                     <SelectItem value="OTH">OTH – Andere Quelle</SelectItem>
                   </SelectContent>
@@ -260,7 +259,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
               <div>
                 <Label className="flex items-center gap-1 text-sm">
                   Wechselkurs EUR (FXEURRate)
-                  <FieldHelp text="EZB-Referenzkurs für die Umrechnung der Basiswährung in Euro per letztem Arbeitstag des Meldezeitraums. 4 Dezimalstellen." />
+                  <FieldHelp text="EZB-Referenzkurs der Basiswährung gegenüber EUR per letztem Arbeitstag des Meldezeitraums. 4 Dezimalstellen. Beispiel USD: 1.0823 bedeutet 1 EUR = 1.0823 USD." />
                 </Label>
                 <Input
                   className="mt-1"
@@ -273,7 +272,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="flex items-center gap-1 text-sm">
                     Name der Wechselkursquelle
-                    <FieldHelp text="Freitext: Name der Quelle des verwendeten Wechselkurses, wenn nicht EZB (z.B. Bloomberg, Reuters)." />
+                    <FieldHelp text="Freitext: Name der Quelle des verwendeten Wechselkurses wenn nicht EZB. Beispiele: Bloomberg, Reuters, Bundesbank." />
                   </Label>
                   <Input
                     className="mt-1"
