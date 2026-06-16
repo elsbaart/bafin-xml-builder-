@@ -71,10 +71,10 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
       <div>
         <h3 className="font-medium mb-1 flex items-center gap-1">
           5 wichtigste Handelsmärkte (AIFMPrincipalMarkets)
-          <FieldHelp text="Die 5 wichtigsten Märkte, an denen die KVG für ihre AIF handelt — aggregiert über alle verwalteten AIF. Absteigend nach aggregiertem Wert sortieren. Typisch für einen PE-Buyout-Fonds MidCap: alle 5 Ränge auf 'XXX' (kein spezifischer Markt), da PE-Investments nicht an Börsen gehandelt werden. Aggregierter Wert = Gesamtinvestitionsvolumen des jeweiligen Marktes in der Basiswährung." />
+          <FieldHelp text="Die 5 wichtigsten Märkte, aggregiert über alle AIF, absteigend nach Wert sortiert. Markttypen: XXX = kein spezifischer Markt (direkte Unternehmensbeteiligungen, Fair Value als Wert), OTC = außerbörslich (Geldmarkt, Liquiditätsanlagen), MIC = börsennotiert (post-IPO-Positionen, Anteilstausch, dann MIC-Code angeben), NOT = Rang wird nicht genutzt (keine Betragsangabe). PE-Buyout MidCap Beispiel: Rang 1 = XXX (Portfoliounternehmen, z.B. 240 Mio.), Rang 2 = OTC (Liquidität, z.B. 10 Mio.), Rang 3 = MIC+XFRA falls börsennotierte Positionen vorhanden, Ränge ohne Nutzung = NOT." />
         </h3>
         <p className="text-sm text-muted-foreground mb-3">
-          PE-Fonds: typischerweise alle Ränge auf <strong>XXX</strong> (kein spezifischer Markt)
+          PE-Buyout typisch: <strong>Rang 1 XXX</strong> (Portfoliounternehmen) · <strong>Rang 2 OTC</strong> (Liquidität) · nicht genutzte Ränge auf <strong>NOT</strong> setzen
         </p>
         <div className="space-y-4">
           {data.principalMarkets.map((m, i) => (
@@ -86,7 +86,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Markttyp
-                    <FieldHelp text="MIC: Regulierter Handelsplatz mit ISO-10383-Code (Börsen). OTC: außerbörslicher Handel. XXX: kein spezifischer Markt — typisch für PE (Direktinvestments in Unternehmen). NOT: dieser Rang wird nicht genutzt." />
+                    <FieldHelp text="MIC: Börsennotierter Handel (post-IPO-Aktien, nach Anteilstausch) → MIC-Code pflegen. OTC: Außerbörslich (Geldmarktinstrumente, OTC-Derivate, Schuldscheindarlehen). XXX: Kein spezifischer Markt (direkte Unternehmensbeteiligungen, nicht-börsennotiert) → Wert = Fair Value der Portfoliounternehmen. NOT: Rang wird nicht genutzt → kein Betrag nötig. Wichtig: NOT ≠ XXX — NOT heißt 'kein Eintrag', XXX heißt 'außerbörsliches Investment mit Wert'." />
                   </Label>
                   <Select
                     value={m.marketCodeType}
@@ -119,7 +119,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Aggregierter Wert (Basiswährung)
-                    <FieldHelp text="Aggregierter Wert aller Assets, die an diesem Markt gehandelt werden — über alle AIF summiert, in der Basiswährung des AIFM, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums. Entfällt bei Markttyp NOT." />
+                    <FieldHelp text="Summe aller Assets dieses Markttyps, über alle AIF aggregiert, in der Basiswährung, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums. Bei XXX: Fair Value der direkten Unternehmensbeteiligungen. Bei OTC: Marktwert der Geldmarkt-/Liquiditätsanlagen. Bei MIC: Börsenmarktwert der notierten Positionen. Entfällt bei Markttyp NOT." />
                   </Label>
                   <Input
                     className="mt-1"
