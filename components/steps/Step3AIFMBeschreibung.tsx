@@ -2,7 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FieldHelp } from "@/components/FieldHelp";
+import { FieldHelp, TooltipSection } from "@/components/FieldHelp";
 import type { AIFMFormData, MarketEntry, InstrumentEntry } from "@/lib/types";
 import { SUB_ASSET_TYPES } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +15,86 @@ interface Props {
 const MARKET_CODE_TYPE_LABELS = {
   MIC: "MIC – Handelsplatz mit MIC-Code (z.B. XFRA für Frankfurt)",
   OTC: "OTC – Over-the-Counter / außerbörslich",
-  XXX: "XXX – Kein spezifischer Markt (typisch für PE-Fonds)",
-  NOT: "NOT – Kein Eintrag für diesen Rang",
+  XXX: "XXX – Kein spezifischer Markt (direkte Beteiligungen)",
+  NOT: "NOT – Rang wird nicht genutzt",
 };
+
+const marketsTooltip = (
+  <div>
+    <p>Die 5 wichtigsten Märkte, an denen die KVG für ihre AIF handelt — über alle AIF aggregiert, absteigend nach Wert. Nicht genutzte Ränge auf <strong>NOT</strong> setzen (kein Betrag).</p>
+    <p className="mt-1"><strong>Markttypen:</strong> MIC = Börse (MIC-Code angeben) · OTC = außerbörslich · XXX = kein spezifischer Markt (direkte Investments) · NOT = Rang nicht genutzt</p>
+    <TooltipSection label="PE-Buyout MidCap Beispiel">
+      <p>Rang 1: <strong>XXX</strong> – Portfoliounternehmen (Fair Value, z.B. 240.000.000)</p>
+      <p>Rang 2: <strong>OTC</strong> – Liquiditätsanlagen / Geldmarkt (z.B. 10.000.000)</p>
+      <p>Rang 3: <strong>MIC + XFRA</strong> – falls börsennotierte Positionen (post-IPO, Anteilstausch)</p>
+      <p>Ränge ohne Nutzung: <strong>NOT</strong> (kein Betrag)</p>
+    </TooltipSection>
+    <TooltipSection label="VRUK">
+      <p>Bei <strong>NoReportingFlag = true</strong> entfällt dieser Block. Sobald ein AIF aktiv investiert, Flag deaktivieren und Märkte befüllen.</p>
+    </TooltipSection>
+  </div>
+);
+
+const marketTypeTooltip = (
+  <div>
+    <p><strong>MIC</strong> – Regulierter Handelsplatz mit ISO-10383-Code → MIC-Code pflegen (z.B. XFRA, XETR, XLON). Für börsennotierte Positionen nach IPO oder Anteilstausch.</p>
+    <p className="mt-1"><strong>OTC</strong> – Außerbörslich: Geldmarktinstrumente, Schuldscheindarlehen, OTC-Derivate zur Absicherung.</p>
+    <p className="mt-1"><strong>XXX</strong> – Kein spezifischer Markt: direkte Unternehmensbeteiligungen (nicht börsennotiert). Wert = Fair Value der Portfoliounternehmen.</p>
+    <p className="mt-1"><strong>NOT</strong> – Rang nicht genutzt. Kein Betrag angeben. NOT ≠ XXX.</p>
+  </div>
+);
+
+const marketValueTooltip = (
+  <div>
+    <p>Summe aller Assets dieses Markttyps, über alle AIF aggregiert, in der Basiswährung, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums.</p>
+    <TooltipSection label="Je nach Markttyp">
+      <p><strong>XXX:</strong> Fair Value der direkten Unternehmensbeteiligungen</p>
+      <p><strong>OTC:</strong> Wert der Geldmarkt-/Liquiditätsanlagen</p>
+      <p><strong>MIC:</strong> Börsenmarktwert der notierten Positionen</p>
+      <p><strong>NOT:</strong> kein Betrag</p>
+    </TooltipSection>
+  </div>
+);
+
+const instrumentsTooltip = (
+  <div>
+    <p>Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 AIFMD-Verordnung), über alle AIF aggregiert, absteigend nach Wert. Nicht genutzte Ränge auf <strong>NTA_NTA_NOTA</strong> setzen (kein Betrag).</p>
+    <TooltipSection label="PE-Buyout MidCap Beispiel">
+      <p>Rang 1: <strong>SEC_SHP_NES</strong> – direkte Eigenkapitalbeteiligungen (nicht börsennotiert), Fair Value z.B. 240 Mio.</p>
+      <p>Rang 2: <strong>LON_LON_LCOR</strong> – Mezzanine / Gesellschafterdarlehen, z.B. 30 Mio.</p>
+      <p>Rang 3: <strong>SEC_MBO_MMKT</strong> oder <strong>CSH_CSH_DPST</strong> – Liquiditätsreserve / Bankguthaben, z.B. 10 Mio.</p>
+      <p>Rang 4: <strong>SEC_SHP_EQS</strong> – falls börsennotierte Positionen (post-IPO, Anteilstausch)</p>
+      <p>Rang 4/5: <strong>DER_FEX_HEDG</strong> oder <strong>DER_IRD_INTR</strong> – Währungs- oder Zinsabsicherung falls vorhanden</p>
+      <p>Nicht genutzte Ränge: <strong>NTA_NTA_NOTA</strong></p>
+    </TooltipSection>
+    <TooltipSection label="VRUK">
+      <p>Bei <strong>NoReportingFlag = true</strong> entfällt dieser Block. Sobald ein AIF aktiv investiert, Flag deaktivieren und Instrumente befüllen.</p>
+    </TooltipSection>
+  </div>
+);
+
+const subAssetTypeTooltip = (
+  <div>
+    <p>Asset-Klasse nach Annex II Tabelle 1 AIFMD-Verordnung, höchster verfügbarer Detaillierungsgrad verwenden.</p>
+    <TooltipSection label="Wichtigste Typen für PE-Fonds">
+      <p><strong>SEC_SHP_NES</strong> – Eigenkapital nicht-börsennotiert (Kernposition PE-Buyout)</p>
+      <p><strong>SEC_SHP_EQS</strong> – Aktien börsennotiert (post-IPO, Anteilstausch)</p>
+      <p><strong>LON_LON_LCOR</strong> – Unternehmenskredite / Mezzanine</p>
+      <p><strong>SEC_MBO_MMKT</strong> – Geldmarktinstrumente (Liquiditätsanlage)</p>
+      <p><strong>CSH_CSH_DPST</strong> – Bankguthaben / Einlagen</p>
+      <p><strong>DER_FEX_HEDG</strong> – Devisenderivate (Währungsabsicherung)</p>
+      <p><strong>DER_IRD_INTR</strong> – Zinsderivate (Zinsabsicherung)</p>
+      <p><strong>NTA_NTA_NOTA</strong> – Rang nicht genutzt (kein Betrag)</p>
+    </TooltipSection>
+  </div>
+);
+
+const instrumentValueTooltip = (
+  <div>
+    <p>Fair Value bzw. Marktwert aller Positionen dieser Klasse über alle AIF, in Basiswährung, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums.</p>
+    <p className="mt-1">Bei <strong>NTA_NTA_NOTA</strong>: kein Betrag angeben.</p>
+  </div>
+);
 
 export function Step3AIFMBeschreibung({ data, onChange }: Props) {
   const updateMarket = (i: number, patch: Partial<MarketEntry>) => {
@@ -41,7 +118,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
           <div>
             <Label className="flex items-center gap-1">
               LEI-Code (AIFMIdentifierLEI)
-              <FieldHelp text="Legal Entity Identifier nach ISO 17442, 20-stellig. Die BaFin prüft die Prüfsumme. Bei Änderung des LEI sind zusätzlich ReportingMemberState und AIFMNationalCode in den Identifier-Block aufzunehmen. Für VRUK: LEI bei der Bundesbank oder GLEIF abrufbar." />
+              <FieldHelp text="Legal Entity Identifier nach ISO 17442, 20-stellig. Die BaFin prüft die Prüfsumme. Bei Änderung des LEI sind zusätzlich ReportingMemberState und AIFMNationalCode in den Identifier-Block aufzunehmen. LEI abrufbar über gleif.org oder die Bundesbank." />
             </Label>
             <Input
               className="mt-1 font-mono"
@@ -69,13 +146,10 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
 
       {/* Principal Markets */}
       <div>
-        <h3 className="font-medium mb-1 flex items-center gap-1">
+        <h3 className="font-medium mb-3 flex items-center gap-1">
           5 wichtigste Handelsmärkte (AIFMPrincipalMarkets)
-          <FieldHelp text="Die 5 wichtigsten Märkte, aggregiert über alle AIF, absteigend nach Wert sortiert. Markttypen: XXX = kein spezifischer Markt (direkte Unternehmensbeteiligungen, Fair Value als Wert), OTC = außerbörslich (Geldmarkt, Liquiditätsanlagen), MIC = börsennotiert (post-IPO-Positionen, Anteilstausch, dann MIC-Code angeben), NOT = Rang wird nicht genutzt (keine Betragsangabe). PE-Buyout MidCap Beispiel: Rang 1 = XXX (Portfoliounternehmen, z.B. 240 Mio.), Rang 2 = OTC (Liquidität, z.B. 10 Mio.), Rang 3 = MIC+XFRA falls börsennotierte Positionen vorhanden, Ränge ohne Nutzung = NOT." />
+          <FieldHelp text={marketsTooltip} />
         </h3>
-        <p className="text-sm text-muted-foreground mb-3">
-          PE-Buyout typisch: <strong>Rang 1 XXX</strong> (Portfoliounternehmen) · <strong>Rang 2 OTC</strong> (Liquidität) · nicht genutzte Ränge auf <strong>NOT</strong> setzen
-        </p>
         <div className="space-y-4">
           {data.principalMarkets.map((m, i) => (
             <div key={i} className="border rounded-md p-4">
@@ -86,7 +160,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Markttyp
-                    <FieldHelp text="MIC: Börsennotierter Handel (post-IPO-Aktien, nach Anteilstausch) → MIC-Code pflegen. OTC: Außerbörslich (Geldmarktinstrumente, OTC-Derivate, Schuldscheindarlehen). XXX: Kein spezifischer Markt (direkte Unternehmensbeteiligungen, nicht-börsennotiert) → Wert = Fair Value der Portfoliounternehmen. NOT: Rang wird nicht genutzt → kein Betrag nötig. Wichtig: NOT ≠ XXX — NOT heißt 'kein Eintrag', XXX heißt 'außerbörsliches Investment mit Wert'." />
+                    <FieldHelp text={marketTypeTooltip} />
                   </Label>
                   <Select
                     value={m.marketCodeType}
@@ -105,7 +179,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     MIC-Code
-                    <FieldHelp text="Nur ausfüllen wenn Markttyp = MIC. Vierstelliger ISO-10383-Code des Handelsplatzes. Beispiele: XFRA (Frankfurt), XMUN (München), XETR (Xetra), XLON (London). Entfällt bei PE-Fonds (XXX)." />
+                    <FieldHelp text="Nur ausfüllen wenn Markttyp = MIC. Vierstelliger ISO-10383-Code. Beispiele: XFRA (Frankfurt), XETR (Xetra), XMUN (München), XLON (London), XPAR (Paris)." />
                   </Label>
                   <Input
                     className="mt-1 font-mono"
@@ -119,7 +193,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Aggregierter Wert (Basiswährung)
-                    <FieldHelp text="Summe aller Assets dieses Markttyps, über alle AIF aggregiert, in der Basiswährung, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums. Bei XXX: Fair Value der direkten Unternehmensbeteiligungen. Bei OTC: Marktwert der Geldmarkt-/Liquiditätsanlagen. Bei MIC: Börsenmarktwert der notierten Positionen. Entfällt bei Markttyp NOT." />
+                    <FieldHelp text={marketValueTooltip} />
                   </Label>
                   <Input
                     className="mt-1"
@@ -137,13 +211,10 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
 
       {/* Principal Instruments */}
       <div>
-        <h3 className="font-medium mb-1 flex items-center gap-1">
+        <h3 className="font-medium mb-3 flex items-center gap-1">
           5 wichtigste Instrumentenklassen (AIFMPrincipalInstruments)
-          <FieldHelp text="Die 5 wichtigsten Asset-Klassen (Sub-Asset-Types gemäß Annex II Tabelle 1 AIFMD-Verordnung), in denen die KVG für ihre AIF handelt — über alle AIF aggregiert, absteigend nach Wert. PE-Buyout MidCap Beispiel: Rang 1 = SEC_SHP_NES (direkte Eigenkapitalbeteiligungen an nicht-börsennotierten Unternehmen, Fair Value z.B. 240 Mio.), Rang 2 = LON_LON_LCOR (Mezzanine- oder Gesellschafterdarlehen, z.B. 30 Mio.), Rang 3 = SEC_MBO_MMKT oder CSH_CSH_DPST (Liquiditätsreserve / Geldmarkt, z.B. 10 Mio.), Rang 4 = SEC_SHP_EQS falls börsennotierte Positionen nach IPO oder Anteilstausch vorhanden. Nicht genutzte Ränge: NTA_NTA_NOTA (kein Betrag). NTA_NTA_NOTA ≠ 'kein Markt' — es bedeutet 'dieser Rang wird nicht genutzt'." />
+          <FieldHelp text={instrumentsTooltip} />
         </h3>
-        <p className="text-sm text-muted-foreground mb-3">
-          PE-Buyout typisch: <strong>Rang 1 SEC_SHP_NES</strong> (Eigenkapital nicht-börsennotiert) · <strong>Rang 2 LON_LON_LCOR</strong> (Mezzanine/Kredit) · <strong>Rang 3 SEC_MBO_MMKT</strong> (Liquidität) · nicht genutzte Ränge auf <strong>NTA_NTA_NOTA</strong>
-        </p>
         <div className="space-y-4">
           {data.principalInstruments.map((inst, i) => (
             <div key={i} className="border rounded-md p-4">
@@ -154,7 +225,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Sub-Asset-Typ
-                    <FieldHelp text="Asset-Klasse nach Annex II Tabelle 1 AIFMD-Verordnung, höchster Detaillierungsgrad. Wichtigste Typen für PE: SEC_SHP_NES = direkte Eigenkapitalbeteiligungen (nicht börsennotiert, Hauptposition PE-Buyout), SEC_SHP_EQS = börsennotierte Aktien (post-IPO oder nach Anteilstausch), LON_LON_LCOR = Unternehmenskredite / Mezzanine, SEC_MBO_MMKT = Geldmarktinstrumente (Liquiditätsanlage), CSH_CSH_DPST = Einlagen/Bankguthaben. NTA_NTA_NOTA = Rang nicht genutzt (kein Betrag angeben). Wert = Fair Value bzw. Marktwert aller Positionen dieser Klasse über alle AIF, in Basiswährung, ohne Dezimalstellen." />
+                    <FieldHelp text={subAssetTypeTooltip} />
                   </Label>
                   <Select
                     value={inst.subAssetType}
@@ -173,7 +244,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
                 <div>
                   <Label className="text-xs flex items-center gap-1">
                     Aggregierter Wert (Basiswährung)
-                    <FieldHelp text="Aggregierter Wert aller Assets dieser Klasse in der Basiswährung des AIFM, ohne Dezimalstellen, per letztem Arbeitstag des Meldezeitraums. Entfällt bei NTA_NTA_NOTA." />
+                    <FieldHelp text={instrumentValueTooltip} />
                   </Label>
                   <Input
                     className="mt-1"
@@ -196,7 +267,7 @@ export function Step3AIFMBeschreibung({ data, onChange }: Props) {
           <div>
             <Label className="flex items-center gap-1">
               AuM in Euro (AUMAmountInEuro)
-              <FieldHelp text="Gesamte verwaltete Vermögenswerte aller AIF in Euro, berechnet nach Art. 2 der delegierten AIFMD-Verordnung (Brutto-Methode: Summe der absoluten Werte aller Positionen). Angabe ohne Dezimalstellen. PE-Buyout MidCap: typisch 150–500 Mio. EUR, z.B. 250000000." />
+              <FieldHelp text="Gesamte verwaltete Vermögenswerte aller AIF in Euro, berechnet nach Art. 2 der delegierten AIFMD-Verordnung (Brutto-Methode). Angabe ohne Dezimalstellen. PE-Buyout MidCap: typisch 150–500 Mio. EUR." />
             </Label>
             <Input
               className="mt-1"
